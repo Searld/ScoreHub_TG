@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections;
+using System.Net;
 using System.Net.Http.Headers;
 using ScoreHub_TG;
 using Telegram.Bot;
@@ -7,7 +8,11 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types.Enums;
 using User = ScoreHub_TG.User;
 
-var botClient = new TelegramBotClient("8248315151:AAHhR39w2gAAmrWSJk8hvMjLQeUy3sQjmNc"); 
+DotNetEnv.Env.Load();
+string token = Environment.GetEnvironmentVariable("BOT_TOKEN");
+var botClient = new TelegramBotClient(token); 
+
+await botClient.DeleteWebhook();
 
 using var cts = new CancellationTokenSource();
 using var context = new TgBotDbContext();
@@ -60,8 +65,8 @@ async Task StartCommandHandler(string messageText, ITelegramBotClient bot,
     }
     
     var userId = messageText.Split(' ')[1];
-    
-    if (await API.VerifyData(userId))
+    var result = await API.VerifyData(userId);
+    if (result)
     {
         //await SaveUser(chatId, userId);
         var user = await API.GetUser(userId);
